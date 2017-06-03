@@ -6,6 +6,8 @@ import conf as cf
 import json as js
 from tkinter import *
 import sys
+import os
+
 global DOWNLOADING_SONG_NAME
 global percent
 DOWNLOADING_SONG_NAME=''
@@ -71,7 +73,8 @@ def download_work(url_dict):
     URL_DOWNLOAD={}
     global DOWNLOADING_SONG_NAME
     global percent
-
+    path="E:\\"+cf.UserID+"\\"
+    os.mkdir(path)
     for key in url_dict:
         url=url_dict[key]
         content=download_url(url)
