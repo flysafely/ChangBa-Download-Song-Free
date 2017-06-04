@@ -1,15 +1,17 @@
 import urllib.request
 import tkinter
+from tkinter import *
 import re
 import time
 import conf as cf
 import json as js
-from tkinter import *
 import sys
 import os
-
+from tkinter.filedialog import *
+from tkinter.messagebox import *
 global DOWNLOADING_SONG_NAME
 global percent
+global path
 DOWNLOADING_SONG_NAME=''
 USER_AGENT={}
 USER_AGENT['User-Agent']=cf.Mobile_User_Agent
@@ -54,16 +56,6 @@ def download_url(website):
         return html_content
     except urllib.error.HTTPError as err:
         print(err.msg)
-'''	
-    try:
-		req = urllib.request.Request(website,headers=USER_AGENT)
-		html = urllib.request.urlopen(req)
-		html_content = html.read().decode('utf8')
-		#print(html_content)
-		return html_content
-	except urllib.error.HTTPError as err:
-		print(err.msg)
-'''
 
 def get_object_element(reg,content):
 	object_element_list=re.findall(reg,content)
@@ -73,21 +65,35 @@ def download_work(url_dict):
     URL_DOWNLOAD={}
     global DOWNLOADING_SONG_NAME
     global percent
-    path="E:\\"+cf.UserID+"\\"
-    os.mkdir(path)
-    for key in url_dict:
-        url=url_dict[key]
-        content=download_url(url)
-        #time.sleep(0.3)
-        if len(get_object_element(cf.ADD_REG_EXP4,content))!= 0:
-                content_part=get_object_element(cf.ADD_REG_EXP4,content)[0]
-        try:
-                DOWNLOADING_SONG_NAME=str(key)
-                urllib.request.urlretrieve(content_part,"E:\\"+cf.UserID+"\\" + file_name_check(str(key)) + ".mp3",callbackfunc)
-        except urllib.error.HTTPError as reason:
-                print(reason)
- 
-    print(URL_DOWNLOAD)
+    global path
+    print('<---------------------------下载文件存放在：%s 中......' % path)
+    if os.path.exists(path):
+        for key in url_dict:
+            url=url_dict[key]
+            content=download_url(url)
+            #time.sleep(0.3)
+            if len(get_object_element(cf.ADD_REG_EXP4,content))!= 0:
+                    content_part=get_object_element(cf.ADD_REG_EXP4,content)[0]
+            try:
+                    DOWNLOADING_SONG_NAME=str(key)
+                    urllib.request.urlretrieve(content_part,path + '/'+file_name_check(str(key)) + ".mp3",callbackfunc)
+            except urllib.error.HTTPError as reason:
+                    print(reason)
+    else:
+        os.mkdir(path)
+        for key in url_dict:
+            url=url_dict[key]
+            content=download_url(url)
+            #time.sleep(0.3)
+            if len(get_object_element(cf.ADD_REG_EXP4,content))!= 0:
+                    content_part=get_object_element(cf.ADD_REG_EXP4,content)[0]
+            try:
+                    DOWNLOADING_SONG_NAME=str(key)
+                    urllib.request.urlretrieve(content_part,path +'/'+ file_name_check(str(key)) + ".mp3",callbackfunc)
+            except urllib.error.HTTPError as reason:
+                    print(reason)
+    print('                                                                                          \r', end='')
+    print('<---------------------------下载完成！共计下载歌曲：%s'% str(len(sum([i[2] for i in os.walk(path)],[]))))
  
 def callbackfunc(blocknum, blocksize, totalsize):
     '''回调函数
@@ -100,18 +106,14 @@ def callbackfunc(blocknum, blocksize, totalsize):
     percent = 100.0 * blocknum * blocksize / totalsize
     if percent > 100:
         percent = 100
-    print('<---"%s"--->进度 = %-6.2f%%\r' % (DOWNLOADING_SONG_NAME,percent))
+    print('                                                         \r', end='')
+    print(('<---"%s"--->进度 = %-6.2f%%--->\r' % (DOWNLOADING_SONG_NAME,percent)), end='')
 
 def run():
     URL_DICT={}
     pagenum=0
-    print('<---------------------------数据爬取中,即将开始下载--------------------------->\r')
-    for i in range(25):
-        sys.stdout.write('<---------------------------{0}秒/剩余时间25秒--------------------------->\r'.format(i + 1))
-        sys.stdout.flush()
-        time.sleep(1)
+    print('<---------------------------数据爬取中,即将开始下载--------------------------->')
     while len(get_work_list(cf.SONG_URL1,cf.SONG_URL2,cf.SONG_URL3,str(pagenum),str(get_userid(cf.UserID))))!=2:
-        
         CONTENT_JSON=get_work_list(cf.SONG_URL1,cf.SONG_URL2,cf.SONG_URL3,str(pagenum),str(get_userid(cf.UserID)))
         CONVERT_CONTENT=js.loads(CONTENT_JSON)
         pagenum+=1
@@ -130,29 +132,37 @@ def file_name_check(name):
             name_array[name_array.index(i)]='~'
     result_str = ('').join(name_array)
     return result_str
+
 def clicl_btn():
-    userid=v2.get()
+    global path
+    userid=v1.get()
     root.withdraw()
     if userid == '':
-        messagebox('请输入主播ID！')
+        tkinter.messagebox.askokcancel('请输入主播ID')
     else:
         cf.UserID=userid
-        
+        path=v2.get()+'/'+cf.UserID
         run()
+        
 
+def get_path():
+    choose_path=tkinter.filedialog.askdirectory()
+    v2.set(choose_path)
+
+#创建输入窗口
 root = tkinter.Tk()
 root.title('请输入主播ID')
-root.geometry('300x100') 
-root.attributes("-alpha", 0.95)
+root.geometry('300x140') 
+#root.attributes("-alpha", 0.95)
 root.iconbitmap('K:\Python\DLLs\py.ico')
-v2 = StringVar()
-#设置entry为只读属性
-Label(root, text="主播ID：").pack()
-#默认情况下下Entry的状态为normal
-Entry(root, width=30,textvariable=v2).pack()
-v2.set("")
-#将输入的内容用密文的形式显示
-Button(root, text="确定",width=30, command = clicl_btn).pack()
-
+v1 = StringVar()
+l1=Label(root, text="主播ID：",justify=LEFT).grid(column=3, row=1, sticky=W)
+Entry(root, width=30,textvariable=v1,justify=LEFT).grid(column=3, row=2, sticky=W)
+v1.set("")
+v2=StringVar()
+l2=Label(root, text="存储位置：",justify=LEFT).grid(column=3, row=3, sticky=W)
+v2.set('E:\\')
+Entry(root, width=30,textvariable=v2,justify=LEFT).grid(column=3, row=4, sticky=W)
+Button(root, text="路径",width=5,command = get_path).grid(column=4, row=4, sticky=W)
+Button(root, text="确定",width=30, command = clicl_btn).grid(column=3, row=6, sticky=W)
 root.mainloop()
-#run()
