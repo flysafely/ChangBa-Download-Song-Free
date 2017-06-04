@@ -43,6 +43,7 @@ ADD_REG_EXP2= '[\s\S]*<ul id="share_list"'
 ADD_REG_EXP3= '\/s\/[a-zA-Z0-9\s\S]{22}'
 ADD_REG_EXP4='http:\/\/.*[0-9a-zA-Z]\.mp3'
 ADD_REG_EXP5='var userid =.*'
+ADD_REG_EXP6='<!--.*\/\/安全原因-->'
 
 MAIN_URL = 'http://changba.com'
 USER_URL_PART='/u/26078537#work_list'
@@ -52,9 +53,14 @@ SONG_URL1='http://changba.com/member/personcenter/loadmore.php?ver=1&pageNum='
 SONG_URL2='&type=0&userid='
 SONG_URL3='&curuserid=-1'
 
+PATH=''
+URL_DICT={}
+percent=0.0
+DOWNLOADING_SONG_NAME=''
 #45664,83878088
 Mobile_User_Agent='Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36'
 UserID='26078537'
+UserName=''
 FAKE_HEADER = {
     #'User-Agent': random.choice(USER_AGENTS),
     'User-Agent': Mobile_User_Agent,
