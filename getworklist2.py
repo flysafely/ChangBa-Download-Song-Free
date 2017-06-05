@@ -9,8 +9,6 @@ import sys
 import os
 from tkinter.filedialog import *
 from tkinter.messagebox import *
-USER_AGENT={}
-USER_AGENT['User-Agent']=cf.Mobile_User_Agent
 
 # 链接代理
 def	build_proxy():
@@ -43,9 +41,9 @@ def get_work_list(site_part1,site_part2,site_part3,pagenum,userid):
         print(err.msg)
 
 def download_url(website):
-    req = urllib.request.Request(website,headers=USER_AGENT)
-    req.add_header=('Referer','http://www.changba.com/u/'+cf.UserID)
-    req.add_header=('User-Agent',cf.Mobile_User_Agent)
+    req = urllib.request.Request(website,headers=cf.FAKE_HEADER)
+    #req.add_header=('Referer','http://www.changba.com/u/'+cf.UserID)
+    #req.add_header=('User-Agent',cf.Mobile_User_Agent)
     try:
         html = urllib.request.urlopen(req)
         html_content = html.read().decode('utf8')
@@ -96,7 +94,7 @@ def callbackfunc(blocknum, blocksize, totalsize):
     cf.percent = 100.0 * blocknum * blocksize / totalsize
     if cf.percent > 100:
         cf.percent = 100
-    print('                                                                                                                                                          \r', end='')
+    print('                                                                                         \r', end='')
     print(('<---"%s"--->进度 = %-6.2f%%--->\r' % (cf.DOWNLOADING_SONG_NAME,cf.percent)), end='')
 
 def run():
@@ -113,7 +111,6 @@ def run():
 
     cf.UserName=get_username()
     cf.PATH=cf.PATH+cf.UserName
-    #print(cf.PATH)
     print('<---------------------------正在下载\'%s\'的歌曲--------------------------->' % cf.UserName)
     download_work(cf.URL_DICT)
 
@@ -142,25 +139,27 @@ def get_path():
 
 
 def get_username():
-    for i in cf.URL_DICT:
-        website=cf.URL_DICT[i]
-        break
-    req=urllib.request.Request(website)
-    html = urllib.request.urlopen(req)
-    html_content =html.read().decode('utf8')
-    content=get_object_element(cf.ADD_REG_EXP6,html_content)[0]
-    content_clean=file_name_check(content)
-    name=content_clean[0:content_clean.index('安')]
-    return name
+	for i in cf.URL_DICT:
+		website=cf.URL_DICT[i]
+		break
+	req=urllib.request.Request(website)
+	html = urllib.request.urlopen(req)
+	html_content =html.read().decode('utf8')
 
-
-
+	if len(get_object_element(cf.ADD_REG_EXP6,html_content))!=0:
+		content=get_object_element(cf.ADD_REG_EXP6,html_content)[0]
+		content_clean=file_name_check(content)
+		name=content_clean[0:content_clean.index('安')]
+	else:
+		print("未找到用户名称！")
+		name='匿名'
+	return name
 #创建输入窗口
 root = tkinter.Tk()
 root.title('请输入主播ID')
-root.geometry('300x140') 
+root.geometry('215x170')
 #root.attributes("-alpha", 0.95)
-root.iconbitmap('K:\Python\DLLs\py.ico')
+root.iconbitmap(r'C:\Users\Administrator\Desktop\QTPlayer.ico')
 v1 = StringVar()
 l1=Label(root, text="主播ID：",justify=LEFT).grid(column=3, row=1, sticky=W)
 Entry(root, width=30,textvariable=v1,justify=LEFT).grid(column=3, row=2, sticky=W)
@@ -168,8 +167,8 @@ v1.set("")
 v2=StringVar()
 l2=Label(root, text="存储位置：",justify=LEFT).grid(column=3, row=3, sticky=W)
 v2.set('E:\\')
-Entry(root, width=30,textvariable=v2,justify=LEFT).grid(column=3, row=4, sticky=W)
-Button(root, text="路径",width=5,command = get_path).grid(column=4, row=4, sticky=W)
-Button(root, text="确定",width=30, command = clicl_btn).grid(column=3, row=6, sticky=W)
-
+Entry(root, width=25,textvariable=v2,justify=LEFT).grid(column=3, row=4, sticky=W)
+Button(root, text="路径",width=4,command = get_path).grid(column=3, row=4, sticky=E)
+Label(root, text="",justify=LEFT).grid(column=3, row=5, sticky=W)
+Button(root, text="开始下载",width=20, command = clicl_btn).grid(column=3, row=6)
 root.mainloop()

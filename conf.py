@@ -60,13 +60,10 @@ DOWNLOADING_SONG_NAME=''
 #45664,83878088
 Mobile_User_Agent='Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36'
 UserID='26078537'
+#26078537
 UserName=''
 FAKE_HEADER = {
     #'User-Agent': random.choice(USER_AGENTS),
     'User-Agent': Mobile_User_Agent,
-    'Connection': 'keep-alive',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Referer': 'http://changba.com/u/'+'',
-    'Accept-Encoding': 'gzip, deflate, sdch',
-    'Accept-Language': 'en-US,en;q=0.8',
+    'Referer': 'http://www.changba.com/u/'+UserID,
 }
